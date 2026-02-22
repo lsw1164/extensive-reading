@@ -1,0 +1,35 @@
+name: Weekly Fine Settlement
+
+on:
+  schedule:
+    - cron: "1 17 * * 0"
+  workflow_dispatch:
+
+jobs:
+  run-weekly-settlement:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build -w @extensive-reading/shared && npm run build -w @extensive-reading/jobs
+
+      - name: Send weekly settlement
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_GROUP_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          WEEKLY_TARGET_COUNT: ${{ secrets.WEEKLY_TARGET_COUNT }}
+          FINE_PER_MISSED_CERT: ${{ secrets.FINE_PER_MISSED_CERT }}
+          PARTICIPANTS: ${{ secrets.PARTICIPANTS }}
+        run: node apps/jobs/dist/jobs/weekly-settlement.js

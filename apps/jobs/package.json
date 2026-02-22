@@ -1,0 +1,20 @@
+{
+  "name": "@extensive-reading/jobs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "job:daily": "node --env-file=../../.env dist/jobs/daily-status.js",
+    "job:weekly": "node --env-file=../../.env dist/jobs/weekly-settlement.js",
+    "job:participants": "node --env-file=../../.env dist/jobs/participants-from-telegram.js",
+    "job:user:add": "node --env-file=../../.env dist/jobs/user-add.js",
+    "job:user:remove": "node --env-file=../../.env dist/jobs/user-remove.js",
+    "job:user:sync": "node --env-file=../../.env dist/jobs/user-sync-from-telegram.js"
+  },
+  "dependencies": {
+    "@extensive-reading/shared": "*"
+  }
+}

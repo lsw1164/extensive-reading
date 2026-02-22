@@ -1,0 +1,12 @@
+{
+  "functions": [
+    {
+      "source": "apps/functions",
+      "codebase": "telegram-webhook",
+      "predeploy": [
+        "npm run build -w @extensive-reading/shared",
+        "npm run build -w @extensive-reading/functions"
+      ]
+    }
+  ]
+}

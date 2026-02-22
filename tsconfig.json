@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "apps/functions" },
+    { "path": "apps/jobs" }
+  ]
+}

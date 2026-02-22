@@ -1,0 +1,42 @@
+{
+  "name": "extensive-reading",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": "24.x"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @extensive-reading/shared && npm run build -w @extensive-reading/functions && npm run build -w @extensive-reading/jobs",
+    "test": "npm run test -w @extensive-reading/functions",
+    "prejob:daily": "npm run build -w @extensive-reading/shared && npm run build -w @extensive-reading/jobs",
+    "job:daily": "npm run job:daily -w @extensive-reading/jobs",
+    "prejob:weekly": "npm run build -w @extensive-reading/shared && npm run build -w @extensive-reading/jobs",
+    "job:weekly": "npm run job:weekly -w @extensive-reading/jobs",
+    "prejob:participants": "npm run build -w @extensive-reading/jobs",
+    "job:participants": "npm run job:participants -w @extensive-reading/jobs",
+    "prejob:user:add": "npm run build -w @extensive-reading/jobs",
+    "job:user:add": "npm run job:user:add -w @extensive-reading/jobs",
+    "prejob:user:remove": "npm run build -w @extensive-reading/jobs",
+    "job:user:remove": "npm run job:user:remove -w @extensive-reading/jobs",
+    "prejob:user:sync": "npm run build -w @extensive-reading/jobs",
+    "job:user:sync": "npm run job:user:sync -w @extensive-reading/jobs",
+    "deploy:functions": "npm run deploy:functions:dev",
+    "deploy:functions:dev": "firebase deploy --project extensive-reading-dev --only functions:telegram-webhook",
+    "deploy:functions:prod": "firebase deploy --project extensive-reading-prod --only functions:telegram-webhook"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.5",
+    "@types/supertest": "^6.0.3",
+    "firebase-tools": "^15.6.0",
+    "supertest": "^7.1.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  }
+}
