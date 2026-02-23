@@ -11,8 +11,8 @@
 ## 기능
 
 1. Firebase Function 웹훅이 들어온 Telegram update 중 인증 조건을 만족한 사진만 `cert_events`에 저장
-2. GitHub Actions(일간)에서 KST 02:00 종료 / 02:01 시작 기준으로 이번 주 인증 횟수 집계 후 그룹 메시지 전송
-3. GitHub Actions(주간)에서 KST 02:00 종료 / 02:01 시작 기준으로 지난주 인증 횟수 벌금 정산 메시지 전송
+2. GitHub Actions(일간, 화~일 KST 02:01)에서 KST 02:00 종료 / 02:01 시작 기준으로 이번 주 인증 횟수 집계 후 그룹 메시지 전송
+3. GitHub Actions(주간, 월 KST 02:01)에서 KST 02:00 종료 / 02:01 시작 기준으로 지난주 인증 횟수 벌금 정산 메시지 전송
 
 ## 환경 변수
 

@@ -2,7 +2,7 @@ name: Daily Cert Status
 
 on:
   schedule:
-    - cron: "1 17 * * *"
+    - cron: "1 17 * * 1-6"
   workflow_dispatch:
 
 jobs:
