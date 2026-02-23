@@ -110,8 +110,8 @@ export const runParticipantsFromTelegram = async (): Promise<void> => {
     .map(([id, name]) => `${id}:${name}`)
     .join(",");
 
-  console.log("# Telegram 관리자 + cert_events 일반 멤버 기준 PARTICIPANTS 초안");
-  console.log(`PARTICIPANTS=${participants}`);
+  console.log("# Telegram 관리자 + cert_events 일반 멤버 기준 사용자 목록 초안");
+  console.log(participants);
 };
 
 if (require.main === module) {

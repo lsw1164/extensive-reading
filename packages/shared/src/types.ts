@@ -28,8 +28,3 @@ export interface TelegramUpdate {
   update_id: number;
   message?: TelegramMessage;
 }
-
-export interface Participant {
-  id: string;
-  name: string;
-}

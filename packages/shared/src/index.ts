@@ -4,4 +4,4 @@ export { getDb } from "./firebase";
 export { getCurrentWeekRange, getLastWeekRange } from "./time";
 export { sendTelegramMessage } from "./telegram";
 export { listActiveManagedUsers, setManagedUserActive, upsertManagedUser } from "./users";
-export type { Participant, TelegramUpdate } from "./types";
+export type { TelegramUpdate } from "./types";

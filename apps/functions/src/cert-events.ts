@@ -53,11 +53,7 @@ const isCertMessage = (message?: TelegramMessage): message is TelegramMessage =>
     return false;
   }
 
-  if (!config.certCaptionRegex) {
-    return true;
-  }
-
-  return config.certCaptionRegex.test(message.caption ?? "");
+  return true;
 };
 
 export const saveCertEventIfMatched = async (update: TelegramUpdate): Promise<boolean> => {

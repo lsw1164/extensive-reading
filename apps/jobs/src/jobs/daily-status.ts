@@ -2,6 +2,7 @@ import {
   countByUserBetween,
   getCurrentWeekRange,
   getJobConfig,
+  listActiveManagedUsers,
   sendTelegramMessage
 } from "@extensive-reading/shared";
 
@@ -9,20 +10,19 @@ export const runDailyStatus = async (): Promise<void> => {
   const config = getJobConfig();
   const range = getCurrentWeekRange();
   const counts = await countByUserBetween(range.start, range.end);
+  const managedUsers = await listActiveManagedUsers(config.telegramGroupChatId);
 
   const users = new Map<string, { name: string; count: number }>();
-  counts.forEach((value, userId) => {
-    users.set(userId, { name: value.userName, count: value.count });
+  managedUsers.forEach((user) => {
+    users.set(user.userId, { name: user.name, count: 0 });
   });
 
-  config.participants.forEach((participant) => {
-    const existing = users.get(participant.id);
+  counts.forEach((value, userId) => {
+    const existing = users.get(userId);
     if (existing) {
-      existing.name = participant.name;
+      existing.count = value.count;
       return;
     }
-
-    users.set(participant.id, { name: participant.name, count: 0 });
   });
 
   const sortedUsers = Array.from(users.values()).sort(

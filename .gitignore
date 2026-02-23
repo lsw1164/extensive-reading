@@ -2,7 +2,10 @@
 .env.*
 !.env.example
 !**/.env.example
+!.env.sample
+!**/.env.sample
 **/dist/
+*.tsbuildinfo
 
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim
 

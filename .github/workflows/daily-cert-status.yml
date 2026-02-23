@@ -29,6 +29,4 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_GROUP_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
-          CERT_CAPTION_REGEX: ${{ secrets.CERT_CAPTION_REGEX }}
-          PARTICIPANTS: ${{ secrets.PARTICIPANTS }}
         run: node apps/jobs/dist/jobs/daily-status.js
