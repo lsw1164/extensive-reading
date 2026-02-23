@@ -6,7 +6,12 @@ import { TelegramChatMember, TelegramUpdate, TelegramUser } from "./types";
 
 export interface UserSyncResult {
   upsertCount: number;
-  messageSource: "message" | "edited_message" | "channel_post" | "edited_channel_post" | "none";
+  messageSource:
+    | "message"
+    | "edited_message"
+    | "channel_post"
+    | "edited_channel_post"
+    | "none";
   configuredChatId: string;
   incomingMessageChatId?: string;
   incomingChatMemberChatId?: string;
@@ -21,10 +26,15 @@ export interface UserSyncResult {
 const usersCollection = () => getDb().collection("users");
 
 const resolveMessageForUserSync = (
-  update: TelegramUpdate
+  update: TelegramUpdate,
 ): {
   message: TelegramUpdate["message"];
-  source: "message" | "edited_message" | "channel_post" | "edited_channel_post" | "none";
+  source:
+    | "message"
+    | "edited_message"
+    | "channel_post"
+    | "edited_channel_post"
+    | "none";
 } => {
   if (update.message) {
     return { message: update.message, source: "message" };
@@ -39,7 +49,10 @@ const resolveMessageForUserSync = (
   }
 
   if (update.edited_channel_post) {
-    return { message: update.edited_channel_post, source: "edited_channel_post" };
+    return {
+      message: update.edited_channel_post,
+      source: "edited_channel_post",
+    };
   }
 
   return { message: undefined, source: "none" };
@@ -58,7 +71,10 @@ const toComparableChatIds = (chatId: string): Set<string> => {
   return ids;
 };
 
-const matchesConfiguredChat = (incomingChatId: string, configuredChatId: string): boolean => {
+const matchesConfiguredChat = (
+  incomingChatId: string,
+  configuredChatId: string,
+): boolean => {
   const incomingIds = toComparableChatIds(incomingChatId);
   const configuredIds = toComparableChatIds(configuredChatId);
 
@@ -76,7 +92,10 @@ const resolveDisplayName = (user?: TelegramUser): string => {
     return "unknown";
   }
 
-  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ").trim();
+  const fullName = [user.first_name, user.last_name]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
   if (fullName) {
     return fullName;
   }
@@ -89,7 +108,11 @@ const resolveDisplayName = (user?: TelegramUser): string => {
 };
 
 const resolveActiveFromMember = (member: TelegramChatMember): boolean => {
-  if (member.status === "creator" || member.status === "administrator" || member.status === "member") {
+  if (
+    member.status === "creator" ||
+    member.status === "administrator" ||
+    member.status === "member"
+  ) {
     return true;
   }
 
@@ -102,7 +125,7 @@ const resolveActiveFromMember = (member: TelegramChatMember): boolean => {
 
 const fetchChatMember = async (
   chatId: string,
-  userId: string
+  userId: string,
 ): Promise<TelegramChatMember | undefined> => {
   const config = getWebhookConfig();
   if (!config.telegramBotToken) {
@@ -113,7 +136,7 @@ const fetchChatMember = async (
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, user_id: Number(userId) })
+    body: JSON.stringify({ chat_id: chatId, user_id: Number(userId) }),
   });
 
   const payload = (await response.json()) as {
@@ -127,7 +150,7 @@ const fetchChatMember = async (
       chat_id: chatId,
       user_id: userId,
       status: response.status,
-      description: payload.description
+      description: payload.description,
     });
     return undefined;
   }
@@ -140,28 +163,32 @@ const upsertUserDoc = async (
   user: TelegramUser,
   source: "telegram_message" | "telegram_chat_member",
   status: string,
-  isActive: boolean
+  isActive: boolean,
 ): Promise<void> => {
   const now = Timestamp.now();
-  await usersCollection().doc(String(user.id)).set(
-    {
-      user_id: String(user.id),
-      chat_id: chatId,
-      display_name: resolveDisplayName(user),
-      username: user.username,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      status,
-      is_active: isActive,
-      source,
-      updated_at: now,
-      created_at: now
-    },
-    { merge: true }
-  );
+  await usersCollection()
+    .doc(String(user.id))
+    .set(
+      {
+        user_id: String(user.id),
+        chat_id: chatId,
+        display_name: resolveDisplayName(user),
+        username: user.username,
+        first_name: user.first_name ?? null,
+        last_name: user.last_name ?? null,
+        status,
+        is_active: isActive,
+        source,
+        updated_at: now,
+        created_at: now,
+      },
+      { merge: true },
+    );
 };
 
-export const syncManagedUserFromUpdate = async (update: TelegramUpdate): Promise<UserSyncResult> => {
+export const syncManagedUserFromUpdate = async (
+  update: TelegramUpdate,
+): Promise<UserSyncResult> => {
   const config = getWebhookConfig();
   const chatId = config.telegramGroupChatId;
   const skippedReasons: string[] = [];
@@ -180,17 +207,26 @@ export const syncManagedUserFromUpdate = async (update: TelegramUpdate): Promise
 
   if (message && message.from && messageChatMatched) {
     const incomingChatId = String(message.chat.id);
-    await upsertUserDoc(incomingChatId, message.from, "telegram_message", "member", true);
+    await upsertUserDoc(
+      incomingChatId,
+      message.from,
+      "telegram_message",
+      "member",
+      true,
+    );
     upsertCount += 1;
 
-    const fetchedMember = await fetchChatMember(incomingChatId, String(message.from.id));
+    const fetchedMember = await fetchChatMember(
+      incomingChatId,
+      String(message.from.id),
+    );
     if (fetchedMember?.user) {
       await upsertUserDoc(
         incomingChatId,
         fetchedMember.user,
         "telegram_message",
         fetchedMember.status,
-        resolveActiveFromMember(fetchedMember)
+        resolveActiveFromMember(fetchedMember),
       );
       upsertCount += 1;
     } else {
@@ -204,7 +240,10 @@ export const syncManagedUserFromUpdate = async (update: TelegramUpdate): Promise
 
   const chatMember = update.chat_member;
   if (chatMember) {
-    chatMemberChatMatched = matchesConfiguredChat(String(chatMember.chat.id), chatId);
+    chatMemberChatMatched = matchesConfiguredChat(
+      String(chatMember.chat.id),
+      chatId,
+    );
   }
 
   if (chatMember && chatMemberChatMatched) {
@@ -214,7 +253,7 @@ export const syncManagedUserFromUpdate = async (update: TelegramUpdate): Promise
       chatMember.new_chat_member.user,
       "telegram_chat_member",
       chatMember.new_chat_member.status,
-      resolveActiveFromMember(chatMember.new_chat_member)
+      resolveActiveFromMember(chatMember.new_chat_member),
     );
     upsertCount += 1;
   } else if (chatMember && !chatMemberChatMatched) {
@@ -230,12 +269,14 @@ export const syncManagedUserFromUpdate = async (update: TelegramUpdate): Promise
     messageSource: messagePayload.source,
     configuredChatId: chatId,
     incomingMessageChatId: message ? String(message.chat.id) : undefined,
-    incomingChatMemberChatId: chatMember ? String(chatMember.chat.id) : undefined,
+    incomingChatMemberChatId: chatMember
+      ? String(chatMember.chat.id)
+      : undefined,
     messagePresent: Boolean(message),
     messageChatMatched,
     messageHasFrom,
     chatMemberPresent: Boolean(chatMember),
     chatMemberChatMatched,
-    skippedReasons
+    skippedReasons,
   };
 };

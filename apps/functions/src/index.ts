@@ -72,6 +72,8 @@ export const handleTelegramWebhook = async (
     });
   }
 
+  let stage: "user_sync" | "cert_events" | "completed" | "unknown" = "unknown";
+
   try {
     const parsedUpdate = req.body as TelegramUpdate;
 
@@ -80,6 +82,7 @@ export const handleTelegramWebhook = async (
       update_id: parsedUpdate.update_id
     });
 
+    stage = "user_sync";
     const userSyncResult = await syncManagedUserFromUpdate(parsedUpdate);
     logger.info("telegram webhook user sync result", {
       request_id: requestId,
@@ -133,7 +136,10 @@ export const handleTelegramWebhook = async (
       });
     }
 
+    stage = "cert_events";
     const saved = await saveCertEventIfMatched(parsedUpdate);
+
+    stage = "completed";
 
     logger.info("telegram webhook handled", {
       request_id: requestId,
@@ -145,11 +151,18 @@ export const handleTelegramWebhook = async (
 
     res.status(200).json({ ok: true });
   } catch (error) {
+    const errorName = error instanceof Error ? error.name : "unknown";
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
     logger.error("telegram webhook failed", {
       request_id: requestId,
       update_id: update?.update_id,
+      stage,
       duration_ms: Date.now() - startedAt,
-      error
+      error_name: errorName,
+      error_message: errorMessage,
+      error_stack: errorStack
     });
     res.status(500).json({ ok: false });
   }
